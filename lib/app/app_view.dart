@@ -12,9 +12,6 @@ class AppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dioClient = DioClient();
-    final authRepository = AuthRepository(dioClient);
-
     return FutureBuilder<PreferencesStorage>(
       future: PreferencesStorage.getInstance(),
       builder: (context, snapshot) {
@@ -25,6 +22,8 @@ class AppView extends StatelessWidget {
         }
 
         final storage = snapshot.data!;
+        final dioClient = DioClient(storage: storage);
+        final authRepository = AuthRepository(dioClient);
         final authStorage = AuthStorage(storage);
 
         return MultiRepositoryProvider(
@@ -37,10 +36,12 @@ class AppView extends StatelessWidget {
               BlocProvider<AuthBloc>(
                 create: (context) {
                   final bloc = AuthBloc(authRepository, authStorage);
-                  // Check if user has saved session
                   bloc.add(const CheckAuthStatus());
                   return bloc;
                 },
+              ),
+              BlocProvider<AvarCubit>(
+                create: (context) => AvarCubit(AvarRepository(dioClient)),
               ),
             ],
             child: const AdminPanel(),

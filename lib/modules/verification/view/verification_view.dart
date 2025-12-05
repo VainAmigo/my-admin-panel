@@ -58,11 +58,9 @@ class _VerificationViewState extends State<VerificationView> {
         spacing: 10,
         wrap: true,
       ),
-      CustomTextFormField(
-        width: 300,
+      CustomSearchBar(
         controller: _searchController,
         hintText: 'Поиск',
-        prefixIcon: Icon(Icons.search),
       ),
     ];
   }

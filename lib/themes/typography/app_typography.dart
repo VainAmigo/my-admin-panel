@@ -20,6 +20,12 @@ class AppTypography {
     color: AppColors.black,
   );
 
+  static const black16w400 = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.black,
+  );
+
   static const grey14w500 = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w500,

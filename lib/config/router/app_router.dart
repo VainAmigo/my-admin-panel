@@ -1,5 +1,6 @@
 import 'package:admin_panel/modules/modules.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:admin_panel/server/server.dart';
+import 'package:flutter/material.dart';
 
 @immutable
 final class AppRouter {
@@ -7,17 +8,25 @@ final class AppRouter {
 
   static const main = '/main';
   static const authView = '/';
-  
+
+  // avar
+  static const avarRegisterDetail = '/avar/register/detail';
   static Route<void> onGenerateRoute(RouteSettings settings) {
     return switch (settings.name) {
-      main => CupertinoPageRoute(
-          settings: const RouteSettings(name: main),
-          builder: (_) => const MainView(),
+      main => MaterialPageRoute(
+        settings: const RouteSettings(name: main),
+        builder: (_) => const MainView(),
+      ),
+      authView => MaterialPageRoute(builder: (_) => const AuthView()),
+      avarRegisterDetail => MaterialPageRoute(
+        settings: settings,
+        builder: (_) => AvarRegisterDetail(
+          policyData: settings.arguments as AvarPolicySearchResponse,
         ),
-      authView => CupertinoPageRoute(
-          builder: (_) => const AuthView(),
-        ),
-      _ => throw Exception('No builder specified for route named: [${settings.name}]'),
+      ),
+      _ => throw Exception(
+        'No builder specified for route named: [${settings.name}]',
+      ),
     };
   }
 }

@@ -11,6 +11,7 @@ class Filter extends StatefulWidget {
     this.filtersList,
     this.filterButtonText,
     this.filterTitleText,
+    this.isResetButtonVisible = true,
   });
 
   final void Function()? onFiltersSet;
@@ -18,6 +19,8 @@ class Filter extends StatefulWidget {
   final List<Widget>? filtersList;
   final String? filterButtonText;
   final String? filterTitleText;
+
+  final bool isResetButtonVisible;
 
   @override
   State<Filter> createState() => _FilterState();
@@ -51,7 +54,7 @@ class _FilterState extends State<Filter> {
                     text: widget.filterButtonText ?? 'Сформировать',
                     onPressed: widget.onFiltersSet,
                   ),
-                  TextButton.icon(
+                  if (widget.isResetButtonVisible) TextButton.icon(
                     onPressed: widget.onFiltersReset,
                     icon: Icon(Icons.refresh, size: 16, color: AppColors.grey),
                     label: Text(

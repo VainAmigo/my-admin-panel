@@ -31,6 +31,7 @@ class _AvarViewState extends State<AvarView> {
                   selectedTab: _selectedTab,
                   onTabSelected: _selectTab,
                 ),
+                SizedBox(height: AppSizing.spaceBtwSection,),
                 _buildAvarContent(),
               ],
             ),
@@ -49,7 +50,7 @@ class _AvarViewState extends State<AvarView> {
   Widget _buildAvarContent() {
     switch (_selectedTab) {
       case TabType.registered:
-        return Center(child: Text('Регистрация аварии'));
+        return const AvarRegisterView();
       case TabType.drafted:
         return Center(child: Text('Черновик аварии'));
       case TabType.approved:
@@ -59,12 +60,10 @@ class _AvarViewState extends State<AvarView> {
 }
 
 enum TabType {
-  registered('Регистрация аварии', AppColors.primary25, '10'),
-  drafted('Черновик аварии', AppColors.primary75, '101'),
-  approved('Зарегистрированная авария', AppColors.primary50, '2343');
+  registered('Регистрация аварии'),
+  drafted('Черновик аварии'),
+  approved('Зарегистрированная авария');
 
-  const TabType(this.title, this.color, this.count);
+  const TabType(this.title);
   final String title;
-  final Color color;
-  final String count;
 }

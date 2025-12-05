@@ -6,7 +6,6 @@ part of 'auth_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-// ignore: unused_element
 LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) => LoginRequest(
   username: json['username'] as String,
   password: json['password'] as String,
@@ -26,7 +25,6 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) => AuthResponse(
   token: json['token'] as String,
 );
 
-// ignore: unused_element
 Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
     <String, dynamic>{
       'accessiblePages': instance.accessiblePages,
