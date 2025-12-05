@@ -1,6 +1,7 @@
 export 'form/phone_number_text_field.dart';
 export 'form/text_form_field.dart';
 export 'form/custom_search_bar.dart';
+export 'form/custom_dropdown.dart';
 export 'buttons/primary_button.dart';
 export 'custom_table/custom_table.dart';
 export 'emty_container/emty_container.dart';
@@ -12,3 +13,5 @@ export 'tags/text_tag.dart';
 export 'date_time_picker/custom_date_picker.dart';
 export 'indicator/centered_indicator.dart';
 export 'chips/custom_cips.dart';
+export 'detail_view/detail_view.dart';
+export 'detail_view/detail_info_row.dart';

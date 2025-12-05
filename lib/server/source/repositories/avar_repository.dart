@@ -7,8 +7,9 @@ class AvarRepository {
 
   Future<AvarPolicySearchResponse> getAvarSearch(String policyNumber) async {
     try {
+      final String parameter = policyNumber.toUpperCase();
       final response = await _dioClient.get(
-        '${ApiEndpoints.avarPolicySearch}/$policyNumber',
+        '${ApiEndpoints.avarPolicySearch}/$parameter',
       );
 
       return AvarPolicySearchResponse.fromJson(response.data);
