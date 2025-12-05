@@ -12,20 +12,41 @@ class AppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        
     final dioClient = DioClient();
     final authRepository = AuthRepository(dioClient);
-    
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<AuthRepository>.value(value: authRepository),
-      ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthBloc>(create: (context) => AuthBloc(authRepository)),
-        ],
-        child: const AdminPanel(),
-      ),
+
+    return FutureBuilder<PreferencesStorage>(
+      future: PreferencesStorage.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const MaterialApp(
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          );
+        }
+
+        final storage = snapshot.data!;
+        final authStorage = AuthStorage(storage);
+
+        return MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider<AuthRepository>.value(value: authRepository),
+            RepositoryProvider<AuthStorage>.value(value: authStorage),
+          ],
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<AuthBloc>(
+                create: (context) {
+                  final bloc = AuthBloc(authRepository, authStorage);
+                  // Check if user has saved session
+                  bloc.add(const CheckAuthStatus());
+                  return bloc;
+                },
+              ),
+            ],
+            child: const AdminPanel(),
+          ),
+        );
+      },
     );
   }
 }
@@ -37,14 +58,25 @@ class AdminPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlobalLoaderOverlay(
       overlayWidgetBuilder: (progress) => const OverlayIndicator(),
-      child: MaterialApp(
-        title: 'Admin Panel',
-        // locale: context.watch<LanguageCubit>().state.currentLocale,
-        // localizationsDelegates: AppLocalizations.localizationsDelegates,
-        // supportedLocales: AppLocalizations.supportedLocales,
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: (settings) => AppRouter.onGenerateRoute(settings),
-        theme: const AppTheme().themeData,
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          // Show loading while checking auth status
+          if (state is AuthInitial || state is AuthLoading) {
+            return const MaterialApp(
+              home: Scaffold(body: Center(child: CircularProgressIndicator())),
+            );
+          }
+
+          return MaterialApp(
+            title: 'Admin Panel',
+            debugShowCheckedModeBanner: false,
+            home: state is AuthAuthenticated
+                ? const MainView()
+                : const AuthView(),
+            onGenerateRoute: (settings) => AppRouter.onGenerateRoute(settings),
+            theme: const AppTheme().themeData,
+          );
+        },
       ),
     );
   }

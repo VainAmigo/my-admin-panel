@@ -1,4 +1,5 @@
 import 'package:admin_panel/config/config.dart';
+import 'package:admin_panel/core/core.dart';
 import 'package:admin_panel/modules/modules.dart';
 import 'package:admin_panel/themes/colors/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -145,11 +146,22 @@ class _MainViewState extends State<MainView> {
   }
 
   Widget _buildMenuItems(BuildContext context) {
-    final menuItems = [
+    // Get user roles from AuthBloc
+    final authState = context.watch<AuthBloc>().state;
+    final List<UserRole> userRoles;
+
+    if (authState is AuthAuthenticated) {
+      userRoles = UserRole.fromStringList(authState.authResponse.roles);
+    } else {
+      userRoles = [];
+    }
+
+    final allMenuItems = [
       _MenuItem(
         icon: 'assets/icons/icon_analytics.svg',
         title: 'Аналитика',
         menuItem: MenuItem.analytics,
+        allowedRoles: [UserRole.admin],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.analytics;
@@ -160,6 +172,7 @@ class _MainViewState extends State<MainView> {
         icon: 'assets/icons/icon_reports.svg',
         title: 'Отчеты',
         menuItem: MenuItem.reports,
+        allowedRoles: [UserRole.admin],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.reports;
@@ -170,6 +183,7 @@ class _MainViewState extends State<MainView> {
         icon: 'assets/icons/icon_accounting.svg',
         title: 'Бухгалтерия',
         menuItem: MenuItem.accounting,
+        allowedRoles: [UserRole.admin],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.accounting;
@@ -180,6 +194,7 @@ class _MainViewState extends State<MainView> {
         icon: 'assets/icons/icon_avar.svg',
         title: 'Аварийные комиссар',
         menuItem: MenuItem.avar,
+        allowedRoles: [UserRole.admin, UserRole.avar],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.avar;
@@ -190,6 +205,7 @@ class _MainViewState extends State<MainView> {
         icon: 'assets/icons/icon_verification.svg',
         title: 'Верификация',
         menuItem: MenuItem.verification,
+        allowedRoles: [UserRole.admin],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.verification;
@@ -200,6 +216,7 @@ class _MainViewState extends State<MainView> {
         icon: 'assets/icons/icon_persons.svg',
         title: 'Пользователи',
         menuItem: MenuItem.users,
+        allowedRoles: [UserRole.admin],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.users;
@@ -210,6 +227,7 @@ class _MainViewState extends State<MainView> {
         icon: 'assets/icons/icon_person.svg',
         title: 'Профиль',
         menuItem: MenuItem.profile,
+        allowedRoles: [UserRole.admin],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.profile;
@@ -220,6 +238,7 @@ class _MainViewState extends State<MainView> {
         icon: 'assets/icons/icon_notification.svg',
         title: 'Уведомления',
         menuItem: MenuItem.notifications,
+        allowedRoles: [UserRole.admin],
         onTap: () {
           setState(() {
             _selectedMenuItem = MenuItem.notifications;
@@ -227,6 +246,14 @@ class _MainViewState extends State<MainView> {
         },
       ),
     ];
+
+    // Filter menu items based on user roles
+    final menuItems = RbacService.instance.filterByRoles(
+      items: allMenuItems,
+      userRoles: userRoles,
+      getAllowedRoles: (item) => item.allowedRoles,
+    );
+
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -237,6 +264,7 @@ class _MainViewState extends State<MainView> {
           _MenuItem(
             icon: 'assets/icons/icon_exit.svg',
             title: 'Выход',
+            allowedRoles: [], // No role restriction for logout
             onTap: () => _onLogout(context),
             isExit: true,
           ),
@@ -252,9 +280,7 @@ class _MainViewState extends State<MainView> {
         item.menuItem != null && _selectedMenuItem == item.menuItem;
 
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: showTitle ? 16 : 25,
-      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: showTitle ? 16 : 25),
       leading: SvgPicture.asset(
         item.icon,
         width: 24,
@@ -337,6 +363,7 @@ class _MenuItem {
   final VoidCallback onTap;
   final bool isExit;
   final MenuItem? menuItem;
+  final List<UserRole> allowedRoles;
 
   _MenuItem({
     required this.icon,
@@ -344,5 +371,6 @@ class _MenuItem {
     required this.onTap,
     this.isExit = false,
     this.menuItem,
+    this.allowedRoles = const [],
   });
 }
