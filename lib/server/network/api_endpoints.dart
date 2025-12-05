@@ -1,0 +1,5 @@
+class ApiEndpoints {
+  static const String baseUrl = 'http://192.168.60.117:8008';
+  static const String login = '/api/auth/login';
+  static const String logout = '/api/auth/logout';
+}
