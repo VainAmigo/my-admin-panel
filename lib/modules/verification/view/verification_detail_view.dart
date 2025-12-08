@@ -1,11 +1,13 @@
 import 'package:admin_panel/components/components.dart';
 import 'package:admin_panel/config/config.dart';
+import 'package:admin_panel/modules/modules.dart';
 import 'package:admin_panel/modules/verification/widgets/unverify_dialog.dart';
 import 'package:admin_panel/modules/verification/widgets/verification_info_card.dart';
 import 'package:admin_panel/modules/verification/widgets/verification_photos_card.dart';
 import 'package:admin_panel/server/server.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VerificationDetailView extends StatelessWidget {
   const VerificationDetailView({super.key, required this.verification});
@@ -47,7 +49,7 @@ class VerificationDetailView extends StatelessWidget {
       children: [
         VerificationInfoCard(
           verification: verification,
-          onUnverify: () => _unverify(context),
+          onUnverify: () => _unverifyPressed(context),
           onVerify: () => _verify(context),
         ),
         VerificationPhotosCard(verification: verification),
@@ -67,7 +69,7 @@ class VerificationDetailView extends StatelessWidget {
               flex: 1,
               child: VerificationInfoCard(
                 verification: verification,
-                onUnverify: () => _unverify(context),
+                onUnverify: () => _unverifyPressed(context),
                 onVerify: () => _verify(context),
               ),
             ),
@@ -86,8 +88,8 @@ class VerificationDetailView extends StatelessWidget {
     // TODO: Реализовать логику печати данных
   }
 
-  /// Отмена верификации пользователя
-  void _unverify(BuildContext context) {
+  /// Нажатие на кнопку "Не верифицирован"
+  void _unverifyPressed(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -95,21 +97,31 @@ class VerificationDetailView extends StatelessWidget {
           userName: verification.name,
           onConfirm: (reason, {description}) {
             Navigator.of(dialogContext).pop();
-            // TODO: Добавить логику отмены верификации с причиной
-            // Здесь можно вызвать метод для отмены верификации с переданной причиной
-            print('Причина отказа: $reason');
-            if (description != null) {
-              print('Описание: $description');
-            }
+            _unverifyConfirmed(context);
           },
         );
       },
     );
   }
 
+  /// Подтверждение отмены верификации
+  void _unverifyConfirmed(BuildContext context) {
+    context.read<VerificationCubit>().getVerificationList(
+      isVerified: true,
+      page: 1,
+      limit: 10,
+    );
+    Navigator.pop(context);
+  }
+
   /// Подтверждение верификации пользователя
   void _verify(BuildContext context) {
     // TODO: Реализовать логику верификации
+    context.read<VerificationCubit>().getVerificationList(
+      isVerified: true,
+      page: 1,
+      limit: 10,
+    );
     Navigator.pop(context);
   }
 }
