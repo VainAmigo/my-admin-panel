@@ -9,8 +9,12 @@ final class AppRouter {
   static const main = '/main';
   static const authView = '/';
 
+  // verification
+  static const verificationDetail = '/verification/detail';
+
   // avar
   static const avarRegisterDetail = '/avar/register/detail';
+
   static Route<void> onGenerateRoute(RouteSettings settings) {
     return switch (settings.name) {
       main => MaterialPageRoute(
@@ -22,6 +26,12 @@ final class AppRouter {
         settings: settings,
         builder: (_) => AvarRegisterDetail(
           policyData: settings.arguments as AvarPolicySearchResponse,
+        ),
+      ),
+      verificationDetail => MaterialPageRoute(
+        settings: settings,
+        builder: (_) => VerificationDetailView(
+          verification: settings.arguments as VerificationItem,
         ),
       ),
       _ => throw Exception(

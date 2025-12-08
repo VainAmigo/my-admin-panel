@@ -118,6 +118,14 @@ class _UnverifiedTabViewState extends State<UnverifiedTabView> {
       pagination: pagination,
       minWidth: 1100,
       onPageChanged: _onPageChanged,
+      onTap: (index) {
+        final item = data.verificationsList[index];
+        Navigator.pushNamed(
+          context,
+          AppRouter.verificationDetail,
+          arguments: item,
+        );
+      },
     );
   }
 }

@@ -15,3 +15,5 @@ export 'indicator/centered_indicator.dart';
 export 'chips/custom_cips.dart';
 export 'detail_view/detail_view.dart';
 export 'detail_view/detail_info_row.dart';
+export 'network_image/network_image_viewer.dart';
+export 'network_image/fullscreen_image_viewer.dart';
