@@ -1,3 +1,4 @@
+import 'package:admin_panel/config/config.dart';
 import 'package:flutter/material.dart';
 
 class FullscreenImageViewer extends StatelessWidget {
@@ -11,23 +12,27 @@ class FullscreenImageViewer extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(),
-      body: Image.network(
-        imageUrl,
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
-        fit: BoxFit.fitHeight,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                  : null,
-              color: Colors.white,
-            ),
-          );
-        },
+        child: InteractiveViewer(
+          child: Image.network(
+            imageUrl,
+            fit: Responsive.isMobile(context) ? BoxFit.contain : BoxFit.fitHeight,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                      : null,
+                  color: Colors.white,
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

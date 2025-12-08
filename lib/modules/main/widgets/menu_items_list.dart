@@ -48,13 +48,15 @@ class MenuItemsList extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        ...menuItems.map((item) => MenuItemWidget(
-              item: item,
-              isSelected: item.menuItem != null &&
-                  selectedMenuItem == item.menuItem,
-              showTitle: showTitle,
-              onCloseDrawer: onCloseDrawer,
-            )),
+        ...menuItems.map(
+          (item) => MenuItemWidget(
+            item: item,
+            isSelected:
+                item.menuItem != null && selectedMenuItem == item.menuItem,
+            showTitle: showTitle,
+            onCloseDrawer: onCloseDrawer,
+          ),
+        ),
         const Divider(),
         MenuItemWidget(
           item: MenuItemModel(
@@ -133,4 +135,3 @@ class MenuItemsList extends StatelessWidget {
     ];
   }
 }
-
