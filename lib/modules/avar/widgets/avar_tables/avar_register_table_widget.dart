@@ -32,7 +32,6 @@ class AvarRegisterTableWidget extends StatelessWidget {
       ),
       TableColumn<AvarPolicySearchResponse>(
         title: 'владелец',
-        width: TableConfig.nameWidth,
         dataExtractor: (item) => item.personFullName,
       ),
       TableColumn<AvarPolicySearchResponse>(
@@ -48,7 +47,6 @@ class AvarRegisterTableWidget extends StatelessWidget {
       TableColumn<AvarPolicySearchResponse>(
         title: 'автомобиль',
         dataExtractor: (item) => '${item.brand} ${item.model}',
-        width: TableConfig.carWidth,
       ),
       TableColumn<AvarPolicySearchResponse>(
         title: 'статус',

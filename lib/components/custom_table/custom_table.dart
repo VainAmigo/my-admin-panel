@@ -36,6 +36,7 @@ class TableColumn<T> {
 class CustomTable<T> extends StatelessWidget {
   final List<TableColumn<T>> columns;
   final List<T> data;
+  final int? total;
   final bool showHeader;
   final double? height;
   final Color? headerBackgroundColor;
@@ -55,6 +56,7 @@ class CustomTable<T> extends StatelessWidget {
     super.key,
     required this.columns,
     required this.data,
+    this.total,
     this.showHeader = true,
     this.height,
     this.headerBackgroundColor,
@@ -221,7 +223,7 @@ class CustomTable<T> extends StatelessWidget {
   List<Widget> _buildActionWidgets() {
     return [
       Text(
-        'Найденные записи: ${data.length}',
+        'Найденные записи: ${total ?? data.length}',
         style: AppTypography.black20w400,
       ),
       if (onExport != null)

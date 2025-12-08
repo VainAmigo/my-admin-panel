@@ -46,6 +46,9 @@ class AppView extends StatelessWidget {
               BlocProvider<AvarFilterCubit>(
                 create: (context) => AvarFilterCubit(AvarRepository(dioClient)),
               ),
+              BlocProvider<VerificationCubit>(
+                create: (context) => VerificationCubit(VerificationRepository(dioClient)),
+              ),
             ],
             child: const AdminPanel(),
           ),

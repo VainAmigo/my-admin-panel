@@ -1,8 +1,8 @@
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
 
-class AvarTabCard extends StatelessWidget {
-  const AvarTabCard({
+class TabCard extends StatelessWidget {
+  const TabCard({
     super.key,
     required this.title,
     required this.isActive,

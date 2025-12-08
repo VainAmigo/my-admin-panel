@@ -27,7 +27,7 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isMenuExpanded = true;
-  MenuItem _selectedMenuItem = MenuItem.accounting;
+  MenuItem _selectedMenuItem = MenuItem.verification;
 
   void _toggleMenu() {
     setState(() {

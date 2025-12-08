@@ -22,7 +22,7 @@ class AvarTabsWidget extends StatelessWidget {
         spacing: AppSizing.spaceBtwItm,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: TabType.values.map((tabType) {
-          return AvarTabCard(
+          return TabCard(
             key: ValueKey('avar_tab_${tabType.name}'),
             title: tabType.title,
             isActive: selectedTab == tabType,
@@ -43,7 +43,7 @@ class AvarTabsWidget extends StatelessWidget {
                     ? AppSizing.spaceBtwSection
                     : 0,
               ),
-              child: AvarTabCard(
+              child: TabCard(
                 key: ValueKey('avar_tab_${tabType.name}'),
                 title: tabType.title,
                 isActive: selectedTab == tabType,
