@@ -23,27 +23,15 @@ class AvarCubit extends Cubit<AvarState> {
     }
   }
 
-  // Future<void> getDraftedAvar({required AvarSearchParam param}) async {
-  //   try {
-  //     if (state is EmergancyCommLoading) return;
-  //     emit(const EmergancyCommLoading());
-  //     final data = await repository.getDraftedAvar(param);
-  //     emit(EmergancyCommLoaded(data));
-  //   } catch (e, s) {
-  //     log('EmergancyCommCubit Error: $e\n$s');
-  //     emit(EmergancyCommError(e.toString()));
-  //   }
-  // }
-
-  // Future<void> getApprovedAvar({required AvarSearchParam param}) async {
-  //   try {
-  //     if (state is EmergancyCommLoading) return;
-  //     emit(const EmergancyCommLoading());
-  //     final data = await repository.getApprovedAvar(param);
-  //     emit(EmergancyCommLoaded(data));
-  //   } catch (e, s) {
-  //     log('EmergancyCommCubit Error: $e\n$s');
-  //     emit(EmergancyCommError(e.toString()));
-  //   }
-  // }
+  Future<void> createClaim(AvarCreateClaimRequest request) async {
+    try {
+      if (state is AvarLoading) return;
+      emit(const AvarLoading());
+      final data = await repository.createClaim(request);
+      emit(AvarCreateClaimLoaded(data));
+    } catch (e, s) {
+      log('AvarCubit Error: $e\n$s');
+      emit(AvarCreateClaimError(e.toString()));
+    }
+  }
 }

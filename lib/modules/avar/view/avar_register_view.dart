@@ -27,16 +27,10 @@ class _AvarRegisterViewState extends State<AvarRegisterView> {
         ),
         BlocBuilder<AvarCubit, AvarState>(
           builder: (context, state) {
-            switch (state) {
-              case AvarInitial():
-                return const SizedBox.shrink();
-              case AvarLoading():
-                return const CenteredIndicator();
-              case AvarLoaded():
-                return AvarRegisterTableWidget(data: state.data);
-              case AvarError():
-                return Text(state.error);
-            }
+            if (state is AvarLoading) return const CenteredIndicator();
+            if (state is AvarLoaded) return AvarRegisterTableWidget(data: state.data);
+            if (state is AvarError) return Text(state.error);
+            return const SizedBox.shrink();
           },
         ),
       ],

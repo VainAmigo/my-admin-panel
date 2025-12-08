@@ -52,7 +52,7 @@ class _AvarViewState extends State<AvarView> {
       case TabType.registered:
         return const AvarRegisterView();
       case TabType.drafted:
-        return Center(child: Text('Черновик аварии'));
+        return const AvarDraftedView();
       case TabType.approved:
         return Center(child: Text('Зарегистрированная авария'));
     }

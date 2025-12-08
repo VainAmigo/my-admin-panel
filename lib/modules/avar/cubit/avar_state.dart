@@ -26,3 +26,20 @@ class AvarError extends AvarState {
   const AvarError(this.error);
   final String error;
 }
+
+@immutable
+class AvarCreateClaimLoading extends AvarState {
+  const AvarCreateClaimLoading();
+}
+
+@immutable
+class AvarCreateClaimLoaded extends AvarState {
+  const AvarCreateClaimLoaded(this.data);
+  final AvarCreateClaimResponse data;
+}
+
+@immutable
+class AvarCreateClaimError extends AvarState {
+  const AvarCreateClaimError(this.error);
+  final String error;
+}

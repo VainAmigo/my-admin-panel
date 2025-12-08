@@ -1,8 +1,10 @@
 import 'package:admin_panel/components/components.dart';
 import 'package:admin_panel/core/core.dart';
+import 'package:admin_panel/modules/modules.dart';
 import 'package:admin_panel/server/server.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AvarRegisterDetail extends StatefulWidget {
   const AvarRegisterDetail({super.key, required this.policyData});
@@ -23,13 +25,35 @@ class _AvarRegisterDetailState extends State<AvarRegisterDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return DetailView(
-      appBarTitle: 'Регистрация аварии ${widget.policyData.policyNumber}',
-      infoRows: _buildInfoRows(),
-      editableFields: _buildEditableFields(),
-      child: PrimaryButton(
-        text: 'Сохранить',
-        onPressed: _onSave,
+    return BlocListener<AvarCubit, AvarState>(
+      listener: (context, state) {
+        if (state is AvarCreateClaimLoaded) {
+          AppSnackbar.showSuccess(
+            context: context,
+            title: 'Данные успешно сохранены',
+          );
+          Navigator.of(context).pop();
+        } else if (state is AvarCreateClaimError) {
+          AppSnackbar.showError(
+            context: context,
+            title: 'Ошибка при сохранении',
+            message: state.error,
+          );
+        }
+      },
+      child: DetailView(
+        appBarTitle: 'Регистрация аварии ${widget.policyData.policyNumber}',
+        infoRows: _buildInfoRows(),
+        editableFields: _buildEditableFields(),
+        child: BlocBuilder<AvarCubit, AvarState>(
+          builder: (context, state) {
+            final isLoading = state is AvarCreateClaimLoading;
+            return PrimaryButton(
+              text: 'Сохранить',
+              onPressed: isLoading ? null : _onSave,
+            );
+          },
+        ),
       ),
     );
   }
@@ -138,7 +162,70 @@ class _AvarRegisterDetailState extends State<AvarRegisterDetail> {
   }
 
   void _onSave() {
-    // TODO: Реализовать сохранение данных
-    AppSnackbar.showInfo(context: context, title: 'Данные сохранены');
+    // Проверка заполненности всех полей
+    if (_accidentDate == null) {
+      AppSnackbar.showError(
+        context: context,
+        title: 'Ошибка валидации',
+        message: 'Пожалуйста, выберите дату аварии',
+      );
+      return;
+    }
+
+    final registrationId = _registrationIdController.text.trim();
+    if (registrationId.isEmpty) {
+      AppSnackbar.showError(
+        context: context,
+        title: 'Ошибка валидации',
+        message: 'Пожалуйста, введите РЗНУ',
+      );
+      return;
+    }
+
+    final preliminaryAmountText = _preliminaryAmountController.text.trim();
+    if (preliminaryAmountText.isEmpty) {
+      AppSnackbar.showError(
+        context: context,
+        title: 'Ошибка валидации',
+        message: 'Пожалуйста, введите предварительную сумму',
+      );
+      return;
+    }
+
+    final preliminaryAmount = num.tryParse(preliminaryAmountText);
+    if (preliminaryAmount == null || preliminaryAmount <= 0) {
+      AppSnackbar.showError(
+        context: context,
+        title: 'Ошибка валидации',
+        message: 'Пожалуйста, введите корректную предварительную сумму',
+      );
+      return;
+    }
+
+    if (_selectedDriver == null || _selectedDriver!.isEmpty) {
+      AppSnackbar.showError(
+        context: context,
+        title: 'Ошибка валидации',
+        message: 'Пожалуйста, выберите виновника',
+      );
+      return;
+    }
+
+    // Создание запроса
+    final request = AvarCreateClaimRequest(
+      caseNumber: registrationId,
+      policyNumber: widget.policyData.policyNumber,
+      subjectType: 'INDIVIDUAL',
+      identifier: widget.policyData.personIin,
+      fullNameOrOrg: widget.policyData.personFullName,
+      vehicleNumber: widget.policyData.vehicleNumber,
+      win: widget.policyData.vin,
+      govPlate: widget.policyData.vehicleNumber,
+      dateOfAccident: _accidentDate,
+      preliminaryDamage: preliminaryAmount,
+    );
+
+    // Вызов createClaim
+    context.read<AvarCubit>().createClaim(request);
   }
 }
