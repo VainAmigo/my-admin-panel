@@ -1,6 +1,8 @@
 import 'package:admin_panel/components/components.dart';
 import 'package:admin_panel/config/config.dart';
 import 'package:admin_panel/modules/modules.dart';
+import 'package:admin_panel/modules/verification/models/client_questionnaire_model.dart';
+import 'package:admin_panel/modules/verification/utils/pdf_generator.dart';
 import 'package:admin_panel/modules/verification/widgets/unverify_dialog.dart';
 import 'package:admin_panel/modules/verification/widgets/verification_info_card.dart';
 import 'package:admin_panel/modules/verification/widgets/verification_photos_card.dart';
@@ -84,8 +86,26 @@ class VerificationDetailView extends StatelessWidget {
   }
 
   /// Печать данных верификации
-  void _printData(BuildContext context) {
-    // TODO: Реализовать логику печати данных
+  void _printData(BuildContext context) async {
+    try {
+      // Создаем модель данных анкеты из данных верификации
+      final questionnaireData = ClientQuestionnaireModel.fromVerificationItem(
+        verification,
+      );
+
+      // Генерируем и показываем PDF
+      await PdfGenerator.generateAndShowQuestionnaire(questionnaireData);
+    } catch (e) {
+      // Показываем ошибку пользователю
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ошибка при генерации PDF: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   /// Нажатие на кнопку "Не верифицирован"
