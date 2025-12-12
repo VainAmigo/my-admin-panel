@@ -1,4 +1,3 @@
-import 'package:admin_panel/server/source/models/auth_models.dart';
 import 'package:admin_panel/server/server.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -23,6 +22,10 @@ class LoginRequested extends AuthEvent {
 
 class LogoutRequested extends AuthEvent {
   const LogoutRequested();
+}
+
+class CheckAuthStatus extends AuthEvent {
+  const CheckAuthStatus();
 }
 
 // States
@@ -60,10 +63,36 @@ class AuthUnauthenticated extends AuthState {}
 // Bloc
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  final AuthStorage _authStorage;
 
-  AuthBloc(this._authRepository) : super(AuthInitial()) {
+  AuthBloc(this._authRepository, this._authStorage) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
+    on<CheckAuthStatus>(_onCheckAuthStatus);
+  }
+
+  Future<void> _onCheckAuthStatus(
+    CheckAuthStatus event,
+    Emitter<AuthState> emit,
+  ) async {
+    final token = _authStorage.getToken();
+    final roles = _authStorage.getUserRoles();
+    final accessiblePages = _authStorage.getAccessiblePages();
+    final user = _authStorage.getUserData();
+    
+    if (token != null && token.isNotEmpty && roles.isNotEmpty && user != null) {
+      // User has saved session, restore it
+      final authResponse = AuthResponse(
+        token: token,
+        roles: roles,
+        accessiblePages: accessiblePages,
+        user: user,
+      );
+      emit(AuthAuthenticated(authResponse));
+    } else {
+      // No saved session
+      emit(AuthUnauthenticated());
+    }
   }
 
   Future<void> _onLoginRequested(
@@ -76,6 +105,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.username,
         event.password,
       );
+
+      // Save auth data to storage
+      await _authStorage.saveToken(response.token);
+      await _authStorage.saveUserRoles(response.roles);
+      await _authStorage.saveAccessiblePages(response.accessiblePages);
+      await _authStorage.saveUserData(response.user);
+
       emit(AuthAuthenticated(response));
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -88,9 +124,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       await _authRepository.logout();
+      await _authStorage.clearAuthData();
       emit(AuthUnauthenticated());
     } catch (e) {
       // Даже если запрос на сервер не удался, выходим из приложения
+      await _authStorage.clearAuthData();
       emit(AuthUnauthenticated());
     }
   }

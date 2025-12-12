@@ -1,3 +1,4 @@
-export 'preferences_storage.dart';
-export 'interface/storage_sync_read_interface.dart';
+export 'auth_storage.dart';
 export 'interface/storage_exception.dart';
+export 'interface/storage_sync_read_interface.dart';
+export 'preferences_storage.dart';

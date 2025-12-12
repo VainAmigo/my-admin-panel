@@ -16,69 +16,43 @@ class AvarTabsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     return Responsive(
-      mobile: AvarTabsGridView(
-        crossAxisCount: 2,
-        childAspectRatio: size.width < 650 ? 1.2 : 1.9,
-        selectedTab: selectedTab,
-        onTabSelected: onTabSelected,
-        iconSize: size.width > 420 ? 50 : 40,
+      mobile: Column(
+        key: const ValueKey('avar_tabs_mobile'),
+        spacing: AppSizing.spaceBtwItm,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: TabType.values.map((tabType) {
+          return TabCard(
+            key: ValueKey('avar_tab_${tabType.name}'),
+            title: tabType.title,
+            isActive: selectedTab == tabType,
+            onTap: () => onTabSelected(tabType),
+          );
+        }).toList(),
       ),
-      tablet: AvarTabsGridView(
-        crossAxisCount: 3,
-        childAspectRatio: size.width < 900 ? 1.2 : 1.5,
-        selectedTab: selectedTab,
-        onTabSelected: onTabSelected,
-        iconSize: 50,
+      desktop: Row(
+        key: const ValueKey('avar_tabs_desktop'),
+        children: TabType.values.asMap().entries.map((entry) {
+          final index = entry.key;
+          final tabType = entry.value;
+          return Expanded(
+            key: ValueKey('avar_tab_desktop_${tabType.name}'),
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: index < TabType.values.length - 1
+                    ? AppSizing.spaceBtwSection
+                    : 0,
+              ),
+              child: TabCard(
+                key: ValueKey('avar_tab_${tabType.name}'),
+                title: tabType.title,
+                isActive: selectedTab == tabType,
+                onTap: () => onTabSelected(tabType),
+              ),
+            ),
+          );
+        }).toList(),
       ),
-      desktop: AvarTabsGridView(
-        crossAxisCount: 3,
-        childAspectRatio: size.width > 1300 ? 3 : 1.8,
-        selectedTab: selectedTab,
-        onTabSelected: onTabSelected,
-        iconSize: size.width > 1380 ? 100 : 80,
-      ),
-    );
-  }
-}
-
-class AvarTabsGridView extends StatelessWidget {
-  const AvarTabsGridView({
-    super.key,
-    this.crossAxisCount = 3,
-    this.childAspectRatio = 1.4,
-    required this.selectedTab,
-    required this.onTabSelected,
-    this.iconSize,
-  });
-
-  final int crossAxisCount;
-  final double childAspectRatio;
-  final TabType selectedTab;
-  final Function(TabType) onTabSelected;
-  final double? iconSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        childAspectRatio: childAspectRatio,
-        crossAxisSpacing: AppSizing.spaceBtwSection,
-        mainAxisSpacing: AppSizing.spaceBtwSection,
-      ),
-      children: TabType.values.map((tabType) {
-        return AvarTabCard(
-          title: tabType.title,
-          count: tabType.count,
-          isActive: selectedTab == tabType,
-          onTap: () => onTabSelected(tabType),
-          dotColor: tabType.color,
-        );
-      }).toList(),
     );
   }
 }

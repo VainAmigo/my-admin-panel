@@ -1,4 +1,5 @@
 import 'package:admin_panel/components/components.dart';
+import 'package:admin_panel/modules/modules.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -10,19 +11,7 @@ class VerificationView extends StatefulWidget {
 }
 
 class _VerificationViewState extends State<VerificationView> {
-  late final TextEditingController _searchController;
-
-  @override
-  void initState() {
-    _searchController = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
+  VerificationTabType _selectedTab = VerificationTabType.unverified;
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +24,9 @@ class _VerificationViewState extends State<VerificationView> {
           ),
           child: Column(
             children: [
-              Filter(
-                filterTitleText: 'Фильтры',
-                filterButtonText: 'Поиск',
-                filtersList: _buildFilters(),
-                onFiltersSet: () => _onApplyFilter(context),
-                onFiltersReset: () => _resetFilters(),
-              ),
+              _buildTabs(),
+              SizedBox(height: AppSizing.spaceBtwSection,),
+              _buildVerificationContent(),
             ],
           ),
         ),
@@ -49,25 +34,36 @@ class _VerificationViewState extends State<VerificationView> {
     );
   }
 
-  List<Widget> _buildFilters() {
-    return [
-      CustomChips(
-        items: ['Все', 'Не верифицированные', 'Верифицированные'],
-        initialSelection: 0,
-        onSelectionChanged: (selectedItems) {},
-        spacing: 10,
-        wrap: true,
-      ),
-      CustomTextFormField(
-        width: 300,
-        controller: _searchController,
-        hintText: 'Поиск',
-        prefixIcon: Icon(Icons.search),
-      ),
-    ];
+  void _selectTab(VerificationTabType tabType) {
+    setState(() {
+      _selectedTab = tabType;
+    });
   }
 
-  void _onApplyFilter(BuildContext context) {}
+  Widget _buildTabs() {
+    return Row(
+      spacing: AppSizing.spaceBtwItm,
+      children: [
+        Expanded(child: TabCard(title: 'Не верифицированные', isActive: _selectedTab == VerificationTabType.unverified, onTap: () => _selectTab(VerificationTabType.unverified))),
+        Expanded(child: TabCard(title: 'Верифицированные', isActive: _selectedTab == VerificationTabType.verified, onTap: () => _selectTab(VerificationTabType.verified))),
+      ],
+    );
+  }
 
-  void _resetFilters() {}
+  Widget _buildVerificationContent() {
+    switch (_selectedTab) {
+      case VerificationTabType.unverified:
+        return const UnverifiedTabView(key: ValueKey('unverified'));
+      case VerificationTabType.verified:
+        return const VerifiedTabView(key: ValueKey('verified'));
+    }
+  }
+}
+
+enum VerificationTabType {
+  unverified('Не верифицированные'),
+  verified('Верифицированные');
+
+  const VerificationTabType(this.title);
+  final String title;
 }

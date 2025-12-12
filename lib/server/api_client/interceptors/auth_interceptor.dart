@@ -14,6 +14,16 @@ class AuthInterceptor extends Interceptor {
   static final List<_RequestExecutor> _pendingRequests = [];
 
   @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // Токен авторизации добавляем в заголовки каждого запроса
+    final token = storage.readString(key: 'auth_token');
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+    handler.next(options);
+  }
+
+  @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Token hatası ve refresh endpoint'i değilse
     if ((err.response?.statusCode == 401 || err.response?.statusCode == 403) &&
@@ -61,7 +71,7 @@ class AuthInterceptor extends Interceptor {
           final newRefreshToken = data['refreshToken'];
 
           // Yeni token'ları kaydet
-          storage.writeString(key: 'access_token', value: accessToken);
+          storage.writeString(key: 'auth_token', value: accessToken);
           storage.writeString(key: 'refresh_token', value: newRefreshToken);
 
           // Tüm bekleyen istekleri yeni token ile yeniden gönder

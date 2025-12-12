@@ -2,6 +2,21 @@ import 'package:admin_panel/components/components.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
 
+/// Модель пагинации
+class TablePagination {
+  final int total;
+  final int limit;
+  final int page;
+  final int pages;
+
+  const TablePagination({
+    required this.total,
+    required this.limit,
+    required this.page,
+    required this.pages,
+  });
+}
+
 /// Колонка таблицы
 class TableColumn<T> {
   final String title;
@@ -21,6 +36,7 @@ class TableColumn<T> {
 class CustomTable<T> extends StatelessWidget {
   final List<TableColumn<T>> columns;
   final List<T> data;
+  final int? total;
   final bool showHeader;
   final double? height;
   final Color? headerBackgroundColor;
@@ -33,11 +49,14 @@ class CustomTable<T> extends StatelessWidget {
   final double? minWidth;
   final Function()? onExport;
   final Function(int index)? onTap;
+  final TablePagination? pagination;
+  final Function(int page)? onPageChanged;
 
   const CustomTable({
     super.key,
     required this.columns,
     required this.data,
+    this.total,
     this.showHeader = true,
     this.height,
     this.headerBackgroundColor,
@@ -50,6 +69,8 @@ class CustomTable<T> extends StatelessWidget {
     this.minWidth,
     this.onExport,
     this.onTap,
+    this.pagination,
+    this.onPageChanged,
   });
 
   @override
@@ -102,6 +123,7 @@ class CustomTable<T> extends StatelessWidget {
                   children: [..._buildActionWidgets()],
                 ),
           tableWidget,
+          if (pagination != null) _buildPagination(),
         ],
       ),
     );
@@ -201,7 +223,7 @@ class CustomTable<T> extends StatelessWidget {
   List<Widget> _buildActionWidgets() {
     return [
       Text(
-        'Найденные записи: ${data.length}',
+        'Найденные записи: ${total ?? data.length}',
         style: AppTypography.black20w400,
       ),
       if (onExport != null)
@@ -222,5 +244,49 @@ class CustomTable<T> extends StatelessWidget {
       }
     }
     return totalWidth;
+  }
+
+  Widget _buildPagination() {
+    if (pagination == null || onPageChanged == null) {
+      return const SizedBox.shrink();
+    }
+
+    final currentPage = pagination!.page;
+    final totalPages = pagination!.pages;
+    final total = pagination!.total;
+
+    // Не показываем пагинацию, если нет данных или нет страниц
+    if (totalPages == 0 || total == 0) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Предыдущая страница
+        IconButton(
+          onPressed: currentPage > 1
+              ? () => onPageChanged!(currentPage - 1)
+              : null,
+          icon: const Icon(Icons.chevron_left),
+          color: currentPage > 1 ? AppColors.black : AppColors.grey100,
+        ),
+        const SizedBox(width: 8),
+        // Информация о странице
+        Text(
+          'Страница $currentPage из $totalPages',
+          style: AppTypography.grey14w500,
+        ),
+        const SizedBox(width: 8),
+        // Следующая страница
+        IconButton(
+          onPressed: currentPage < totalPages
+              ? () => onPageChanged!(currentPage + 1)
+              : null,
+          icon: const Icon(Icons.chevron_right),
+          color: currentPage < totalPages ? AppColors.black : AppColors.grey100,
+        ),
+      ],
+    );
   }
 }

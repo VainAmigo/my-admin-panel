@@ -1,10 +1,12 @@
+import 'package:admin_panel/server/api_client/interceptors/auth_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'api_endpoints.dart';
+import 'package:admin_panel/server/storage/preferences_storage.dart';
 
 class DioClient {
   late final Dio _dio;
 
-  DioClient() {
+  DioClient({PreferencesStorage? storage}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
@@ -13,6 +15,13 @@ class DioClient {
         responseType: ResponseType.json,
       ),
     );
+
+    // Добавляем AuthInterceptor если storage передан
+    if (storage != null) {
+      _dio.interceptors.add(
+        AuthInterceptor(storage: storage, dio: _dio),
+      );
+    }
 
     _dio.interceptors.add(
       LogInterceptor(

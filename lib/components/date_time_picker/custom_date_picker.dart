@@ -13,6 +13,7 @@ class CustomDatePicker extends StatelessWidget {
     this.firstDate,
     this.lastDate,
     this.height = 40,
+    this.hintText,
   });
 
   final DateTime? selectedDate;
@@ -23,6 +24,7 @@ class CustomDatePicker extends StatelessWidget {
   final DateTime? firstDate;
   final DateTime? lastDate;
   final double? height;
+  final String? hintText;
 
   Future<void> _selectDate(BuildContext context) async {
     final picked = await showDatePicker(
@@ -74,7 +76,7 @@ class CustomDatePicker extends StatelessWidget {
             Text(
               selectedDate != null
                   ? _formatDate(selectedDate)
-                  : 'Выберите дату',
+                  : hintText ?? 'Выберите дату',
               style: AppTypography.grey14w500,
             ),
 

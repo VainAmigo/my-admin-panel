@@ -1,3 +1,4 @@
+import 'package:admin_panel/components/components.dart';
 import 'package:admin_panel/config/config.dart';
 import 'package:admin_panel/core/core.dart';
 import 'package:admin_panel/modules/modules.dart';
@@ -15,11 +16,13 @@ class AuthView extends StatefulWidget {
 class _AuthViewState extends State<AuthView> {
   late final TextEditingController _phoneController;
   late final TextEditingController _passwordController;
+  late final PasswordVisibilityNotifier _passwordVisibilityNotifier;
 
   @override
   void initState() {
     _phoneController = TextEditingController();
     _passwordController = TextEditingController();
+    _passwordVisibilityNotifier = PasswordVisibilityNotifier();
     super.initState();
   }
 
@@ -44,18 +47,21 @@ class _AuthViewState extends State<AuthView> {
                 mobile: AuthWidget(
                   phoneController: _phoneController,
                   passwordController: _passwordController,
+                  passwordVisibilityNotifier: _passwordVisibilityNotifier,
                   onTapLogin: () => _onTapLogin(),
                 ),
                 tablet: AuthWidget(
                   phoneController: _phoneController,
                   passwordController: _passwordController,
                   width: .4,
+                  passwordVisibilityNotifier: _passwordVisibilityNotifier,
                   onTapLogin: () => _onTapLogin(),
                 ),
                 desktop: AuthWidget(
                   phoneController: _phoneController,
                   passwordController: _passwordController,
                   width: .25,
+                  passwordVisibilityNotifier: _passwordVisibilityNotifier,
                   onTapLogin: () => _onTapLogin(),
                 ),
               ),
