@@ -78,13 +78,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final token = _authStorage.getToken();
     final roles = _authStorage.getUserRoles();
     final accessiblePages = _authStorage.getAccessiblePages();
-
-    if (token != null && token.isNotEmpty && roles.isNotEmpty) {
+    final user = _authStorage.getUserData();
+    
+    if (token != null && token.isNotEmpty && roles.isNotEmpty && user != null) {
       // User has saved session, restore it
       final authResponse = AuthResponse(
         token: token,
         roles: roles,
         accessiblePages: accessiblePages,
+        user: user,
       );
       emit(AuthAuthenticated(authResponse));
     } else {
@@ -108,6 +110,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authStorage.saveToken(response.token);
       await _authStorage.saveUserRoles(response.roles);
       await _authStorage.saveAccessiblePages(response.accessiblePages);
+      await _authStorage.saveUserData(response.user);
 
       emit(AuthAuthenticated(response));
     } catch (e) {

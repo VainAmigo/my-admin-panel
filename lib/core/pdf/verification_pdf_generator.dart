@@ -1,4 +1,5 @@
-import 'package:admin_panel/modules/verification/models/client_questionnaire_model.dart';
+import 'package:admin_panel/core/core.dart';
+import 'package:admin_panel/server/source/source.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -29,9 +30,10 @@ class PdfGenerator {
 
   /// Генерирует и отображает PDF анкеты клиента
   static Future<void> generateAndShowQuestionnaire(
-    ClientQuestionnaireModel data,
+    VerificationItem data,
+    LoginUserDataModel user,
   ) async {
-    final pdf = await _buildPdfDocument(data);
+    final pdf = await _buildPdfDocument(data, user);
     final pdfBytes = await pdf.save();
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdfBytes,
@@ -40,17 +42,19 @@ class PdfGenerator {
 
   /// Генерирует и сохраняет PDF анкеты клиента
   static Future<void> generateAndSaveQuestionnaire(
-    ClientQuestionnaireModel data,
+    VerificationItem data,
     String fileName,
+    LoginUserDataModel user,
   ) async {
-    final pdf = await _buildPdfDocument(data);
+    final pdf = await _buildPdfDocument(data, user);
     final pdfBytes = await pdf.save();
     await Printing.sharePdf(bytes: pdfBytes, filename: fileName);
   }
 
   /// Строит PDF документ
   static Future<pw.Document> _buildPdfDocument(
-    ClientQuestionnaireModel data,
+    VerificationItem data,
+    LoginUserDataModel user,
   ) async {
     final font = await _loadCyrillicFont();
     final pdf = pw.Document(theme: pw.ThemeData.withFont(base: font));
@@ -63,13 +67,13 @@ class PdfGenerator {
         build: (pw.Context context) {
           return [
             // Заголовок документа
-            _buildHeader(data.questionnaireType),
+            _buildHeader(),
             pw.SizedBox(height: 10),
             // Основная таблица анкеты
             _buildQuestionnaireTable(data),
             pw.SizedBox(height: 20),
             // Таблица верификации
-            _buildVerificationTable(data),
+            _buildVerificationTable(data, user),
           ];
         },
       ),
@@ -79,7 +83,7 @@ class PdfGenerator {
   }
 
   /// Создает заголовок документа
-  static pw.Widget _buildHeader(String questionnaireType) {
+  static pw.Widget _buildHeader() {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -96,7 +100,7 @@ class PdfGenerator {
   }
 
   /// Создает основную таблицу анкеты
-  static pw.Widget _buildQuestionnaireTable(ClientQuestionnaireModel data) {
+  static pw.Widget _buildQuestionnaireTable(VerificationItem data) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -171,14 +175,26 @@ class PdfGenerator {
               isBold: true,
             ),
 
-            _buildQuestionRow('2)', 'Фамилия', data.surname ?? '-', data: data, isBold: true),
+            _buildQuestionRow(
+              '2)',
+              'Фамилия',
+              data.personDto?.lastName ?? '',
+              data: data,
+              isBold: true,
+            ),
 
-            _buildQuestionRow('3)', 'Имя', data.name ?? '-', data: data, isBold: true),
+            _buildQuestionRow(
+              '3)',
+              'Имя',
+              data.personDto?.firstName ?? '',
+              data: data,
+              isBold: true,
+            ),
 
             _buildQuestionRow(
               '4)',
               'Отчество (при наличии)',
-              data.secondName ?? '-',
+              data.personDto?.middleName ?? '',
               data: data,
               isBold: true,
             ),
@@ -186,7 +202,7 @@ class PdfGenerator {
             _buildQuestionRow(
               '5)',
               'Дата рождения',
-              data.dateOfBirth ?? '-',
+              data.personDto?.dateOfBirth?.formatted ?? '',
               data: data,
               isBold: true,
             ),
@@ -194,7 +210,7 @@ class PdfGenerator {
             _buildQuestionRow(
               '6)',
               'Место рождения (при наличии)',
-              data.placeOfBirth ?? '-',
+              '-',
               data: data,
               isBold: true,
             ),
@@ -202,12 +218,17 @@ class PdfGenerator {
             _buildQuestionRow(
               '7)',
               'Национальность (при наличии)',
-              data.nationality ?? '-',
+              '-',
               data: data,
               isBold: true,
             ),
 
-            _buildQuestionRow('8)', 'Пол', data.gender ?? '-', data: data),
+            _buildQuestionRow(
+              '8)',
+              'Пол',
+              data.personDto?.gender ?? '',
+              data: data,
+            ),
 
             _buildQuestionRow(
               '9)',
@@ -229,7 +250,7 @@ class PdfGenerator {
             _buildSubQuestionRow(
               '',
               '10.1 Наименование документа',
-              data.documentName ?? '-',
+              data.personDto?.passportSeries ?? '',
               data: data,
               isBold: true,
             ),
@@ -237,7 +258,7 @@ class PdfGenerator {
             _buildSubQuestionRow(
               '',
               '10.2 Серия и номер документа',
-              data.documentSeriesNumber ?? '-',
+              '${data.personDto?.passportSeries ?? ''} ${data.personDto?.passportNumber ?? ''}',
               data: data,
               isBold: true,
             ),
@@ -245,7 +266,7 @@ class PdfGenerator {
             _buildSubQuestionRow(
               '',
               '10.3 Дата выдачи документа',
-              data.issueDate ?? '-',
+              data.personDto?.issuedDate?.formatted ?? '',
               data: data,
               isBold: true,
             ),
@@ -253,7 +274,7 @@ class PdfGenerator {
             _buildSubQuestionRow(
               '',
               '10.4 Дата окончания срока действия документа',
-              data.expiryDate ?? '-',
+              data.personDto?.expiredDate?.formatted ?? '',
               data: data,
               isBold: true,
             ),
@@ -261,7 +282,7 @@ class PdfGenerator {
             _buildSubQuestionRow(
               '',
               '10.5 Наименование органа, выдавшего документ',
-              data.issuingAuthority ?? '-',
+              data.personDto?.passportAuthority ?? '',
               data: data,
               isBold: true,
             ),
@@ -269,7 +290,7 @@ class PdfGenerator {
             _buildSubQuestionRow(
               '',
               '10.6 Код подразделения (если имеется)',
-              data.departmentCode ?? '-',
+              data.personDto?.passportAuthorityCode ?? '',
               data: data,
               isBold: true,
             ),
@@ -277,7 +298,7 @@ class PdfGenerator {
             _buildQuestionRow(
               '11)',
               'Персональный идентификационный номер',
-              data.pin ?? '-',
+              data.personDto?.pin ?? '',
               data: data,
               isBold: true,
             ),
@@ -285,7 +306,7 @@ class PdfGenerator {
             _buildQuestionRow(
               '12)',
               'Адрес места регистрации (при наличии в документе)',
-              data.registrationAddress ?? '-',
+              data.personDto?.message ?? '',
               data: data,
               isBold: true,
             ),
@@ -303,7 +324,7 @@ class PdfGenerator {
               children: [
                 _buildCell(''),
                 _buildCell('Номер мобильного телефона'),
-                _buildCell(data.phoneNumber ?? '-', isBold: true),
+                _buildCell(data.userDto?.username ?? '', isBold: true),
               ],
             ),
           ],
@@ -322,21 +343,22 @@ class PdfGenerator {
             _buildQuestionRow(
               '14)',
               'Цель и предполагаемый характер деловых отношений клиента',
-              data.businessPurpose ?? '-',
+              'СТРАХОВАНИЕ',
               data: data,
+              isBold: true,
             ),
 
             _buildQuestionRow(
               '15)',
               'Является ли клиент публичным должностным лицом (ПДЛ)',
-              data.isPDL ?? '-',
+              data.userDto?.pdl ?? false ? 'Да' : 'Нет',
               data: data,
             ),
 
             _buildQuestionRow(
               '16)',
               'Является ли клиент конечным выгодоприобретателем',
-              data.isBeneficiary ?? '-',
+              data.userDto?.beneficiary ?? false ? 'Да' : 'Нет',
               data: data,
             ),
           ],
@@ -346,7 +368,10 @@ class PdfGenerator {
   }
 
   /// Создает таблицу верификации
-  static pw.Widget _buildVerificationTable(ClientQuestionnaireModel data) {
+  static pw.Widget _buildVerificationTable(
+    VerificationItem data,
+    LoginUserDataModel user,
+  ) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -372,7 +397,7 @@ class PdfGenerator {
                 '2) Не проведена',
                 '3) иное примечание',
                 '4) Дата проведения',
-                '____.________.2024 г. (___:___)'
+                '____.________.2024 г. (___:___)',
               ],
               data: data,
             ),
@@ -385,7 +410,7 @@ class PdfGenerator {
                 '1) Отсутствует в Перечне',
                 '2) Присутствует в Перечне',
                 '3) Дата и время проверки',
-                '____.________.2024 г. (___:___)'
+                '____.________.2024 г. (___:___)',
               ],
               data: data,
             ),
@@ -398,7 +423,7 @@ class PdfGenerator {
                 '1) Отсутствует в Перечне',
                 '2) Присутствует в Перечне',
                 '3) Дата и время проверки',
-                '____.________.2024 г. (___:___)'
+                '____.________.2024 г. (___:___)',
               ],
               data: data,
             ),
@@ -411,7 +436,7 @@ class PdfGenerator {
                 '1) Отсутствует в Перечне',
                 '2) Присутствует в Перечне',
                 '3) Дата и время проверки',
-                '____.________.2024 г. (___:___)'
+                '____.________.2024 г. (___:___)',
               ],
               data: data,
             ),
@@ -420,10 +445,7 @@ class PdfGenerator {
             _buildVerificationQuestionRow(
               '5)',
               'Степень (уровень) риска клиента (нужное подчеркнуть)',
-              [
-                '1) Высокий риск',
-                '2) Низкий риск',
-              ],
+              ['1) Высокий риск', '2) Низкий риск'],
               data: data,
             ),
 
@@ -468,7 +490,7 @@ class PdfGenerator {
                   'Дата занесения в базу данных информации, указанной в настоящей анкете, и ФИО ответственного сотрудника финансового учреждения и нефинансовой категории лиц',
                 ),
                 _buildCell(
-                  '${_formatDate(data.createdDate) ?? '-'}\n${data.createrName ?? '-'}',
+                  '${DateFormat('dd.MM.yyyy').format(DateTime.now())}\n${user.fullName}',
                   isBold: true,
                 ),
               ],
@@ -512,7 +534,7 @@ class PdfGenerator {
     String number,
     String question,
     String answer, {
-    required ClientQuestionnaireModel data,
+    required VerificationItem data,
     bool isBold = false,
   }) {
     return pw.TableRow(
@@ -529,7 +551,7 @@ class PdfGenerator {
     String number,
     String question,
     String answer, {
-    required ClientQuestionnaireModel data,
+    required VerificationItem data,
     bool isBold = false,
   }) {
     return pw.TableRow(
@@ -546,7 +568,7 @@ class PdfGenerator {
     String number,
     String question,
     List<String> answers, {
-    required ClientQuestionnaireModel data,
+    required VerificationItem data,
   }) {
     return pw.TableRow(
       children: [
@@ -598,11 +620,5 @@ class PdfGenerator {
               textAlign: textAlign,
             ),
     );
-  }
-
-  /// Форматирует дату
-  static String? _formatDate(DateTime? date) {
-    if (date == null) return null;
-    return DateFormat('dd.MM.yyyy').format(date);
   }
 }

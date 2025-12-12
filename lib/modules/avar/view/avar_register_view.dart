@@ -42,7 +42,7 @@ class _AvarRegisterViewState extends State<AvarRegisterView> {
       AppSnackbar.showInfo(context: context, title: 'Пожалуйста, введите номер полиса');
       return;
     }
-    context.read<AvarCubit>().getAvarSearch(_policyNumberController.text.trim());
+    context.read<AvarCubit>().getAvarSearch(_policyNumberController.text.trim().toUpperCase());
   }
 
   List<Widget> _buildFilterWidgets() {

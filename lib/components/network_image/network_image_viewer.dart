@@ -3,7 +3,7 @@ import 'package:admin_panel/consts/consts.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
 
-class NetworkImageViewer extends StatelessWidget {
+class NetworkImageViewer extends StatefulWidget {
   const NetworkImageViewer({
     super.key,
     required this.imageUrl,
@@ -33,19 +33,39 @@ class NetworkImageViewer extends StatelessWidget {
   final bool showLabel;
 
   @override
+  State<NetworkImageViewer> createState() => _NetworkImageViewerState();
+}
+
+class _NetworkImageViewerState extends State<NetworkImageViewer> {
+  // Генерируем уникальный timestamp один раз при создании виджета
+  late final int _timestamp;
+  late final String _fullImageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    // Генерируем уникальный timestamp для обхода кеша
+    _timestamp = DateTime.now().millisecondsSinceEpoch;
+    
+    // Формируем полный URL с параметром для обхода кеша
+    var fullUrl = widget.imageUrl.startsWith('http')
+        ? widget.imageUrl
+        : '${ApiConsts.baseUrl}${widget.imageUrl}';
+    final separator = fullUrl.contains('?') ? '&' : '?';
+    _fullImageUrl = '$fullUrl${separator}_t=$_timestamp';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final fullImageUrl = imageUrl.startsWith('http')
-        ? imageUrl
-        : '${ApiConsts.baseUrl}$imageUrl';
 
     return Padding(
       padding: EdgeInsets.only(bottom: AppSizing.spaceBtwSection),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (showLabel && label != null) ...[
+          if (widget.showLabel && widget.label != null) ...[
             Text(
-              label!,
+              widget.label!,
               style: AppTypography.grey14w500,
             ),
             SizedBox(height: AppSizing.spaceBtwItm),
@@ -55,23 +75,24 @@ class NetworkImageViewer extends StatelessWidget {
             child: GestureDetector(
               onTap: () => FullscreenImageViewer.show(
                 context,
-                fullImageUrl,
-                title: label,
+                _fullImageUrl,
+                title: widget.label,
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppSizing.defaultRadius),
                 child: Stack(
                   children: [
                     Image.network(
-                      fullImageUrl,
-                      width: width ?? double.infinity,
-                      height: height,
-                      fit: fit,
+                      _fullImageUrl,
+                      headers: const {'Cache-Control': 'no-cache'},
+                      width: widget.width ?? double.infinity,
+                      height: widget.height,
+                      fit: widget.fit,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Container(
-                          height: height ?? 200,
-                          width: width ?? double.infinity,
+                          height: widget.height ?? 200,
+                          width: widget.width ?? double.infinity,
                           decoration: BoxDecoration(
                             color: AppColors.grey100,
                             borderRadius: BorderRadius.circular(AppSizing.defaultRadius),
@@ -88,8 +109,8 @@ class NetworkImageViewer extends StatelessWidget {
                       },
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          height: height ?? 200,
-                          width: width ?? double.infinity,
+                          height: widget.height ?? 200,
+                          width: widget.width ?? double.infinity,
                           decoration: BoxDecoration(
                             color: AppColors.grey100,
                             borderRadius: BorderRadius.circular(AppSizing.defaultRadius),
@@ -105,7 +126,7 @@ class NetworkImageViewer extends StatelessWidget {
                                 ),
                                 SizedBox(height: AppSizing.spaceBtwItm),
                                 Text(
-                                  'Ошибка загрузки изображения $imageUrl',
+                                  'Ошибка загрузки изображения ${widget.imageUrl}',
                                   style: AppTypography.grey14w500,
                                 ),
                               ],

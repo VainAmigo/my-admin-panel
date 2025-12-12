@@ -76,10 +76,11 @@ class AvarDraftedTableWidget extends StatelessWidget {
       ),
     ];
 
+    // Если pages == 0, то page должен быть 1 для корректного отображения (хотя пагинация не будет показана)
     final pagination = TablePagination(
       total: data.pagination.total,
       limit: data.pagination.limit,
-      page: data.pagination.page,
+      page: data.pagination.pages > 0 ? data.pagination.page : 1,
       pages: data.pagination.pages,
     );
 

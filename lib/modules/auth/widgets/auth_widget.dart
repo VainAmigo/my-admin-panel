@@ -7,12 +7,14 @@ class AuthWidget extends StatelessWidget {
     super.key,
     required this.phoneController,
     required this.passwordController,
+    required this.passwordVisibilityNotifier,
     this.width = 1.0,
     this.onTapLogin,
   });
 
   final TextEditingController phoneController;
   final TextEditingController passwordController;
+  final PasswordVisibilityNotifier passwordVisibilityNotifier;
   final double? width;
   final Function()? onTapLogin;
 
@@ -38,7 +40,11 @@ class AuthWidget extends StatelessWidget {
           ),
           SizedBox(height: AppSizing.spaceBtwSection),
           PhoneNumberTextField(controller: phoneController),
-          CustomTextFormField(controller: passwordController, label: 'Пароль', obscureText: true, maxLines: 1,),
+          PasswordTextField(
+            controller: passwordController,
+            passwordVisibilityNotifier: passwordVisibilityNotifier,
+            label: 'Пароль',
+          ),
           SizedBox(height: AppSizing.space50),
           ValueListenableBuilder(
             valueListenable: passwordController,

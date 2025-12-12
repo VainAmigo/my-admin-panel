@@ -2,6 +2,7 @@ export 'form/phone_number_text_field.dart';
 export 'form/text_form_field.dart';
 export 'form/custom_search_bar.dart';
 export 'form/custom_dropdown.dart';
+export 'form/password_text_field.dart';
 export 'buttons/primary_button.dart';
 export 'custom_table/custom_table.dart';
 export 'emty_container/emty_container.dart';

@@ -12,20 +12,22 @@ class VerificationCubit extends Cubit<VerificationState> {
   final VerificationRepository repository;
 
   Future<void> getVerificationList({
-    required bool isVerified,
-    int page = 1,
+    required VerificationStatus verificationStatus,
+    int page = 0,
     int limit = 10,
   }) async {
     try {
       if (state is VerificationLoading) return;
       emit(const VerificationLoading());
-      
+
       final data = await repository.getVerificationList(
-        isVerified: isVerified,
+        request: VerificationListRequest(
+          verificationStatus: verificationStatus,
+        ),
         page: page,
         limit: limit,
       );
-      
+
       emit(VerificationLoaded(data));
     } catch (e, s) {
       log('VerificationCubit Error: $e\n$s');
@@ -34,3 +36,33 @@ class VerificationCubit extends Cubit<VerificationState> {
   }
 }
 
+class SetVerificationStatusCubit extends Cubit<SetVerificationStatusState> {
+  SetVerificationStatusCubit(this.repository)
+    : super(SetVerificationStatusInitial());
+
+  final VerificationRepository repository;
+
+  Future<void> setVerificationStatus({
+    required String verificationStatus,
+    required int id,
+    required String rejectReasonDescription,
+  }) async {
+    try {
+      emit(const SetVerificationStatusLoading());
+      print('-- ------------------------------ verificationStatus: $verificationStatus');
+      print('-- ------------------------------ rejectReasonDescription: $rejectReasonDescription');
+      print('-- ------------------------------ id: $id');
+      await repository.setVerificationStatus(
+        body: VerificationSetVerificationStatusBody(
+          status: verificationStatus,
+          rejectReasonDescription: rejectReasonDescription,
+        ),
+        id: id,
+      );
+      emit(const SetVerificationStatusLoaded());
+    } catch (e, s) {
+      log('SetVerificationStatusCubit Error: $e\n$s');
+      emit(SetVerificationStatusError(e.toString()));
+    }
+  }
+}

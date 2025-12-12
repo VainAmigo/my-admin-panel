@@ -253,6 +253,12 @@ class CustomTable<T> extends StatelessWidget {
 
     final currentPage = pagination!.page;
     final totalPages = pagination!.pages;
+    final total = pagination!.total;
+
+    // Не показываем пагинацию, если нет данных или нет страниц
+    if (totalPages == 0 || total == 0) {
+      return const SizedBox.shrink();
+    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -36,6 +36,25 @@ class _AvarDraftedViewState extends State<AvarDraftedView> {
               case AvarFilterInitial():
                 return const SizedBox.shrink();
               case AvarFilterLoaded():
+                // Если текущая страница больше доступных страниц или нет данных, сбрасываем на первую страницу
+                if (state.data.pagination.pages > 0 && _currentPage > state.data.pagination.pages) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      setState(() {
+                        _currentPage = 1;
+                      });
+                      _onFiltersSet();
+                    }
+                  });
+                } else if (state.data.pagination.pages == 0 && _currentPage > 1) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      setState(() {
+                        _currentPage = 1;
+                      });
+                    }
+                  });
+                }
                 return AvarDraftedTableWidget(
                   data: state.data,
                   onPageChanged: _onPageChanged,
@@ -54,7 +73,7 @@ class _AvarDraftedViewState extends State<AvarDraftedView> {
       _currentPage = 1;
     });
     context.read<AvarFilterCubit>().getAvarFilteredSearch(
-      page: _currentPage,
+      page: _currentPage - 1, // Конвертируем из 1-based (UI) в 0-based (API запрос)
       limit: _limit,
       policyNumber: _policyNumberController.text.trim().isEmpty
           ? null
@@ -71,7 +90,7 @@ class _AvarDraftedViewState extends State<AvarDraftedView> {
       _currentPage = page;
     });
     context.read<AvarFilterCubit>().getAvarFilteredSearch(
-      page: page,
+      page: page - 1, // Конвертируем из 1-based (UI) в 0-based (API запрос)
       limit: _limit,
       policyNumber: _policyNumberController.text.trim().isEmpty
           ? null

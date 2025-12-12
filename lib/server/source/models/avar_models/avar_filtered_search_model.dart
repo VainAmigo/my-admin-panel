@@ -21,6 +21,9 @@ class AvarFilteredSearchRequest {
   });
 
   Map<String, dynamic> toJson() => _$AvarFilteredSearchRequestToJson(this);
+
+  factory AvarFilteredSearchRequest.fromJson(Map<String, dynamic> json) =>
+      _$AvarFilteredSearchRequestFromJson(json);
 }
 
 @JsonSerializable()
@@ -35,6 +38,8 @@ class AvarFilteredSearchResponse {
 
   factory AvarFilteredSearchResponse.fromJson(Map<String, dynamic> json) =>
       _$AvarFilteredSearchResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AvarFilteredSearchResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -87,6 +92,8 @@ class AvarPolicy {
 
   factory AvarPolicy.fromJson(Map<String, dynamic> json) =>
       _$AvarPolicyFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AvarPolicyToJson(this);
 }
 
 @JsonSerializable()
@@ -105,4 +112,6 @@ class Pagination {
 
   factory Pagination.fromJson(Map<String, dynamic> json) =>
       _$PaginationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PaginationToJson(this);
 }

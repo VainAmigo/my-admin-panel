@@ -128,14 +128,12 @@ class _AvarRegisterDetailState extends State<AvarRegisterDetail> {
           ),
         ],
       ),
-      SizedBox(height: AppSizing.spaceBtwSection),
       // Registration ID
       CustomTextFormField(
         controller: _registrationIdController,
         label: 'РЗНУ',
         hintText: 'РЗНУ',
       ),
-      SizedBox(height: AppSizing.spaceBtwItm),
       // Предварительная сумма
       CustomTextFormField(
         controller: _preliminaryAmountController,
@@ -143,7 +141,6 @@ class _AvarRegisterDetailState extends State<AvarRegisterDetail> {
         hintText: 'Введите сумму',
         keyboardType: TextInputType.number,
       ),
-      SizedBox(height: AppSizing.spaceBtwSection),
       // Виновник (dropdown)
       CustomDropdown<String>(
         label: 'Виновник',

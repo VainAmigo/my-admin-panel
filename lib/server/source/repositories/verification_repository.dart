@@ -2,31 +2,29 @@ import 'package:admin_panel/server/server.dart';
 
 class VerificationRepository {
   final DioClient _dioClient;
-  
-  static const bool useMocks = true;
 
   VerificationRepository(this._dioClient);
 
-  Future<VarificationListResponse> getVerificationList({
-    required bool isVerified,
-    int page = 1,
-    int limit = 10,
+  Future<VerificationListResponse> getVerificationList({
+    required VerificationListRequest request,
+    required int page,
+    required int limit,
   }) async {
-    if (useMocks) {
-      final mockData = isVerified 
-          ? VerificationMocks.getVerifiedListMock(page: page, limit: limit)
-          : VerificationMocks.getUnverifiedListMock(page: page, limit: limit);
-      return VarificationListResponse.fromJson(mockData);
-    }
-
-    final response = await _dioClient.get(
+    final response = await _dioClient.post(
       ApiEndpoints.avarVerifications,
-      queryParameters: {
-        'page': page,
-        'limit': limit,
-        'status': isVerified ? 'verified' : 'pending',
-      },
+      data: request.toJson(),
+      queryParameters: {'page': page, 'limit': limit},
     );
-    return VarificationListResponse.fromJson(response.data);
+    return VerificationListResponse.fromJson(response.data);
+  }
+
+  Future<void> setVerificationStatus({
+    required VerificationSetVerificationStatusBody body,
+    required int id,
+  }) async {
+    await _dioClient.put(
+      '/api/$id/verification-status',
+      data: body.toJson(),
+    );
   }
 }

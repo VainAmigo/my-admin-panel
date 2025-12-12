@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:admin_panel/server/server.dart';
 
 /// Service for storing and retrieving authentication-related data
@@ -7,6 +8,7 @@ class AuthStorage {
   static const String _tokenKey = 'auth_token';
   static const String _userRolesKey = 'user_roles';
   static const String _accessiblePagesKey = 'accessible_pages';
+  static const String _userDataKey = 'user_data';
 
   AuthStorage(this._storage);
 
@@ -37,10 +39,34 @@ class AuthStorage {
     return _storage.readStringList(key: _accessiblePagesKey) ?? [];
   }
 
+  // User data methods
+  Future<bool> saveUserData(LoginUserDataModel userData) async {
+    try {
+      final jsonString = jsonEncode(userData.toJson());
+      return _storage.writeString(key: _userDataKey, value: jsonString);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  LoginUserDataModel? getUserData() {
+    try {
+      final jsonString = _storage.readString(key: _userDataKey);
+      if (jsonString == null || jsonString.isEmpty) {
+        return null;
+      }
+      final json = jsonDecode(jsonString) as Map<String, dynamic>;
+      return LoginUserDataModel.fromJson(json);
+    } catch (e) {
+      return null;
+    }
+  }
+
   // Clear all auth data
   Future<void> clearAuthData() async {
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _userRolesKey);
     await _storage.delete(key: _accessiblePagesKey);
+    await _storage.delete(key: _userDataKey);
   }
 }

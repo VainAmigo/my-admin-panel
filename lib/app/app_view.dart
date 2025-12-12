@@ -49,6 +49,9 @@ class AppView extends StatelessWidget {
               BlocProvider<VerificationCubit>(
                 create: (context) => VerificationCubit(VerificationRepository(dioClient)),
               ),
+              BlocProvider<SetVerificationStatusCubit>(
+                create: (context) => SetVerificationStatusCubit(VerificationRepository(dioClient)),
+              ),
             ],
             child: const AdminPanel(),
           ),

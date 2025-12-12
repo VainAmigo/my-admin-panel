@@ -1,4 +1,5 @@
 import 'package:admin_panel/components/components.dart';
+import 'package:admin_panel/core/core.dart';
 import 'package:admin_panel/server/server.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
@@ -36,24 +37,28 @@ class VerificationInfoCard extends StatelessWidget {
               ),
               SizedBox(height: AppSizing.spaceBtwSection),
               _VerificationInfoRow(
-                label: 'ID',
-                value: verification.id.toString(),
-              ),
-              _VerificationInfoRow(
                 label: 'Имя',
-                value: verification.name,
+                value: verification.personDto?.fullName ?? '',
               ),
               _VerificationInfoRow(
-                label: 'Email',
-                value: verification.email,
+                label: 'Инн',
+                value: verification.personDto?.pin ?? '',
+              ),
+              _VerificationInfoRow(
+                label: 'ID Паспорта',
+                value: '${verification.personDto?.passportSeries ?? ''} ${verification.personDto?.passportNumber ?? ''}',
+              ),
+              _VerificationInfoRow(
+                label: 'День рождения',
+                value: verification.personDto?.dateOfBirth?.formatted ?? '',
               ),
               _VerificationInfoRow(
                 label: 'Телефон',
-                value: verification.phone,
+                value: verification.userDto?.username ?? '',
               ),
               _VerificationInfoRow(
                 label: 'Статус',
-                value: verification.status,
+                value: VerificationStatusUtil.getStatusText(verification.userDto?.verificationStatus),
               ),
             ],
           ),

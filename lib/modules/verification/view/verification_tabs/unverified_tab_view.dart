@@ -1,5 +1,6 @@
 import 'package:admin_panel/components/components.dart';
 import 'package:admin_panel/config/config.dart';
+import 'package:admin_panel/core/core.dart';
 import 'package:admin_panel/modules/modules.dart';
 import 'package:admin_panel/server/server.dart';
 import 'package:admin_panel/themes/theme.dart';
@@ -14,7 +15,7 @@ class UnverifiedTabView extends StatefulWidget {
 }
 
 class _UnverifiedTabViewState extends State<UnverifiedTabView> {
-  int _currentPage = 1;
+  int _currentPage = 0; 
   final int _limit = 10;
   bool _isInitialized = false;
 
@@ -31,15 +32,16 @@ class _UnverifiedTabViewState extends State<UnverifiedTabView> {
 
   void _loadVerifications() {
     context.read<VerificationCubit>().getVerificationList(
-      isVerified: true,
+      verificationStatus: VerificationStatus.pending,
       page: _currentPage,
       limit: _limit,
     );
   }
 
   void _onPageChanged(int page) {
+    // CustomTable передает страницы начиная с 1, конвертируем в формат API (начиная с 0)
     setState(() {
-      _currentPage = page;
+      _currentPage = page - 1;
     });
     _loadVerifications();
   }
@@ -67,59 +69,72 @@ class _UnverifiedTabViewState extends State<UnverifiedTabView> {
     );
   }
 
-  Widget _buildTable(VarificationListResponse data) {
+  Widget _buildTable(VerificationListResponse data) {
+    // Если текущая страница больше доступных страниц или нет данных, сбрасываем на первую страницу
+    // _currentPage - 0-based, data.pagination.pages - 1-based (общее количество страниц)
+    if (data.pagination.pages > 0 && _currentPage >= data.pagination.pages) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _currentPage = 0;
+          });
+          _loadVerifications();
+        }
+      });
+    } else if (data.pagination.pages == 0 && _currentPage > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _currentPage = 0;
+          });
+        }
+      });
+    }
+
     final columns = [
       TableColumn<VerificationItem>(
         title: 'ID',
-        dataExtractor: (item) => item.id.toString(),
+        dataExtractor: (item) => item.userDto?.id?.toString() ?? '',
         width: TableConfig.idWidth,
       ),
       TableColumn<VerificationItem>(
         title: 'Имя',
-        dataExtractor: (item) => item.name,
-      ),
-      TableColumn<VerificationItem>(
-        title: 'Email',
-        dataExtractor: (item) => item.email,
+        dataExtractor: (item) => item.personDto?.fullName ?? '',
       ),
       TableColumn<VerificationItem>(
         title: 'Телефон',
-        dataExtractor: (item) => item.phone,
+        dataExtractor: (item) => item.userDto?.username ?? '',
       ),
       TableColumn<VerificationItem>(
         title: 'Статус',
-        dataExtractor: (item) => item.status,
+        dataExtractor: (item) => item.userDto?.verificationStatus?.name ?? '',
         customBuilder: (item) => TextTag(
-          text: item.status == 'verified'
-              ? 'Верифицирован'
-              : 'Не верифицирован',
-          textColor: item.status == 'verified'
-              ? AppColors.green
-              : AppColors.oragne,
-          color: item.status == 'verified'
-              ? AppColors.green.withAlpha(40)
-              : AppColors.oragne.withAlpha(40),
+          text: VerificationStatusUtil.getStatusText(item.userDto?.verificationStatus),
+          textColor: VerificationStatusUtil.getStatusColor(item.userDto?.verificationStatus),
+          color: VerificationStatusUtil.getStatusColor(item.userDto?.verificationStatus).withAlpha(40),
         ),
       ),
     ];
 
+    // API возвращает страницы начиная с 1, используем напрямую
+    // Если pages == 0, то page должен быть 1 для корректного отображения (хотя пагинация не будет показана)
     final pagination = TablePagination(
       total: data.pagination.total,
       limit: data.pagination.limit,
-      page: data.pagination.page,
+      page: data.pagination.pages > 0 ? data.pagination.page : 1,
       pages: data.pagination.pages,
     );
 
     return CustomTable<VerificationItem>(
       total: pagination.total,
-      data: data.verificationsList,
+      data: data.data,
       columns: columns,
       enableHorizontalScroll: true,
       pagination: pagination,
       minWidth: 1100,
       onPageChanged: _onPageChanged,
       onTap: (index) {
-        final item = data.verificationsList[index];
+        final item = data.data[index];
         Navigator.pushNamed(
           context,
           AppRouter.verificationDetail,

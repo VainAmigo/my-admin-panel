@@ -23,6 +23,7 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) => AuthResponse(
       .toList(),
   roles: (json['roles'] as List<dynamic>).map((e) => e as String).toList(),
   token: json['token'] as String,
+  user: LoginUserDataModel.fromJson(json['user'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
@@ -30,4 +31,5 @@ Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
       'accessiblePages': instance.accessiblePages,
       'roles': instance.roles,
       'token': instance.token,
+      'user': instance.user,
     };

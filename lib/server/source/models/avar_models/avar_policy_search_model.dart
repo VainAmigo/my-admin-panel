@@ -48,6 +48,8 @@ class AvarPolicySearchResponse {
 
   factory AvarPolicySearchResponse.fromJson(Map<String, dynamic> json) =>
       _$AvarPolicySearchResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AvarPolicySearchResponseToJson(this);
 }
 
 @JsonEnum()

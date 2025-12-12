@@ -1,11 +1,7 @@
 import 'package:admin_panel/components/components.dart';
 import 'package:admin_panel/config/config.dart';
+import 'package:admin_panel/core/core.dart';
 import 'package:admin_panel/modules/modules.dart';
-import 'package:admin_panel/modules/verification/models/client_questionnaire_model.dart';
-import 'package:admin_panel/modules/verification/utils/pdf_generator.dart';
-import 'package:admin_panel/modules/verification/widgets/unverify_dialog.dart';
-import 'package:admin_panel/modules/verification/widgets/verification_info_card.dart';
-import 'package:admin_panel/modules/verification/widgets/verification_photos_card.dart';
 import 'package:admin_panel/server/server.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
@@ -87,14 +83,10 @@ class VerificationDetailView extends StatelessWidget {
 
   /// Печать данных верификации
   void _printData(BuildContext context) async {
+    final user = context.read<AuthStorage>().getUserData();
     try {
-      // Создаем модель данных анкеты из данных верификации
-      final questionnaireData = ClientQuestionnaireModel.fromVerificationItem(
-        verification,
-      );
-
       // Генерируем и показываем PDF
-      await PdfGenerator.generateAndShowQuestionnaire(questionnaireData);
+      await PdfGenerator.generateAndShowQuestionnaire(verification, user!);
     } catch (e) {
       // Показываем ошибку пользователю
       if (context.mounted) {
@@ -114,10 +106,10 @@ class VerificationDetailView extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return UnverifyDialog(
-          userName: verification.name,
+          userName: verification.personDto?.fullName ?? '',
           onConfirm: (reason, {description}) {
             Navigator.of(dialogContext).pop();
-            _unverifyConfirmed(context);
+            _unverifyConfirmed(context, description ?? reason);
           },
         );
       },
@@ -125,22 +117,36 @@ class VerificationDetailView extends StatelessWidget {
   }
 
   /// Подтверждение отмены верификации
-  void _unverifyConfirmed(BuildContext context) {
-    context.read<VerificationCubit>().getVerificationList(
-      isVerified: true,
-      page: 1,
-      limit: 10,
+  void _unverifyConfirmed(BuildContext context, String description) {
+    final cubit = context.read<SetVerificationStatusCubit>();
+    cubit.setVerificationStatus(
+      verificationStatus: VerificationStatusUtil.getStatusOriginalValue(
+        VerificationStatus.rejected,
+      ),
+      id: verification.userDto?.id ?? 0,
+      rejectReasonDescription: description,
+    );
+    AppSnackbar.showInfo(
+      context: context,
+      title: 'Верификация успешно откланена',
     );
     Navigator.pop(context);
   }
 
   /// Подтверждение верификации пользователя
   void _verify(BuildContext context) {
-    // TODO: Реализовать логику верификации
-    context.read<VerificationCubit>().getVerificationList(
-      isVerified: true,
-      page: 1,
-      limit: 10,
+    final cubit = context.read<SetVerificationStatusCubit>();
+    cubit.setVerificationStatus(
+      verificationStatus: VerificationStatusUtil.getStatusOriginalValue(
+        VerificationStatus.verified,
+      ),
+      id: verification.userDto?.id ?? 0,
+      rejectReasonDescription: '',
+    );
+
+    AppSnackbar.showSuccess(
+      context: context,
+      title: 'Верификация успешно подтверждена',
     );
     Navigator.pop(context);
   }

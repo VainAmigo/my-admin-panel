@@ -1,13 +1,11 @@
 import 'package:admin_panel/components/components.dart';
+import 'package:admin_panel/consts/consts.dart';
 import 'package:admin_panel/server/server.dart';
 import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
 
 class VerificationPhotosCard extends StatelessWidget {
-  const VerificationPhotosCard({
-    super.key,
-    required this.verification,
-  });
+  const VerificationPhotosCard({super.key, required this.verification});
 
   final VerificationItem verification;
 
@@ -31,9 +29,11 @@ class VerificationPhotosCard extends StatelessWidget {
   }
 
   List<Widget> _buildPhotos() {
-    final hasPhotos = verification.selfLink.isNotEmpty ||
-        verification.passportFrontLink.isNotEmpty ||
-        verification.passportBackLink.isNotEmpty;
+    final hasPhotos =
+        verification.userDto?.selfieUrl?.isNotEmpty ??
+        false ||
+            (verification.userDto?.passportFrontUrl?.isNotEmpty ?? false) ||
+            (verification.userDto?.passportBackUrl?.isNotEmpty ?? false);
 
     if (!hasPhotos) {
       return [
@@ -50,30 +50,29 @@ class VerificationPhotosCard extends StatelessWidget {
     }
 
     return [
-      if (verification.selfLink.isNotEmpty)
-        NetworkImageViewer(
-          height: 250,
-          fit: BoxFit.cover,
-          label: 'Селфи',
-          imageUrl: 'http://192.168.60.117:7007${verification.selfLink}',
-        ),
-      if (verification.passportFrontLink.isNotEmpty)
-        NetworkImageViewer(
-          height: 250,
-          fit: BoxFit.cover,
-          label: 'Паспорт (лицевая сторона)',
-          imageUrl:
-              'http://192.168.60.117:7007${verification.passportFrontLink}',
-        ),
-      if (verification.passportBackLink.isNotEmpty)
-        NetworkImageViewer(
-          height: 250,
-          fit: BoxFit.cover,
-          label: 'Паспорт (обратная сторона)',
-          imageUrl:
-              'http://192.168.60.117:7007${verification.passportBackLink}',
-        ),
+      NetworkImageViewer(
+        height: 250,
+        fit: BoxFit.cover,
+        label: 'Селфи',
+        imageUrl:
+            '${ApiConsts.urlForImages}${verification.userDto?.selfieUrl ?? ''}',
+      ),
+
+      NetworkImageViewer(
+        height: 250,
+        fit: BoxFit.cover,
+        label: 'Паспорт (лицевая сторона)',
+        imageUrl:
+            '${ApiConsts.urlForImages}${verification.userDto?.passportFrontUrl ?? ''}',
+      ),
+
+      NetworkImageViewer(
+        height: 250,
+        fit: BoxFit.cover,
+        label: 'Паспорт (обратная сторона)',
+        imageUrl:
+            '${ApiConsts.urlForImages}${verification.userDto?.passportBackUrl ?? ''}',
+      ),
     ];
   }
 }
-
