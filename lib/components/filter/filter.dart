@@ -27,7 +27,6 @@ class Filter extends StatefulWidget {
 }
 
 class _FilterState extends State<Filter> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -43,7 +42,10 @@ class _FilterState extends State<Filter> {
         children: [
           Row(
             children: [
-              Text(widget.filterTitleText ?? 'Фильтры', style: AppTypography.black20w400),
+              Text(
+                widget.filterTitleText ?? 'Фильтры',
+                style: AppTypography.black20w400,
+              ),
               const Spacer(),
               Row(
                 spacing: 10,
@@ -54,19 +56,23 @@ class _FilterState extends State<Filter> {
                     text: widget.filterButtonText ?? 'Сформировать',
                     onPressed: widget.onFiltersSet,
                   ),
-                  if (widget.isResetButtonVisible) TextButton.icon(
-                    onPressed: widget.onFiltersReset,
-                    icon: Icon(Icons.refresh, size: 16, color: AppColors.grey),
-                    label: Text(
-                      'Сбросить',
-                      style: TextStyle(fontSize: 12, color: AppColors.grey),
+                  if (widget.isResetButtonVisible)
+                    TextButton.icon(
+                      onPressed: widget.onFiltersReset,
+                      icon: Icon(
+                        Icons.refresh,
+                        size: 16,
+                        color: AppColors.grey,
+                      ),
+                      label: Text(
+                        'Сбросить',
+                        style: TextStyle(fontSize: 12, color: AppColors.grey),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ],
           ),
-
           Responsive.isDesktop(context)
               ? Row(
                   spacing: AppSizing.spaceBtwSection,

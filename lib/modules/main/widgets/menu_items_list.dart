@@ -101,7 +101,7 @@ class MenuItemsList extends StatelessWidget {
         icon: 'assets/icons/icon_avar.svg',
         title: 'Аварийные комиссар',
         menuItem: MenuItem.avar,
-        allowedRoles: [UserRole.admin, UserRole.avar],
+        allowedRoles: [UserRole.admin, UserRole.avarSpecialist],
         onTap: () => onMenuItemSelected(MenuItem.avar),
       ),
       MenuItemModel(
@@ -122,7 +122,7 @@ class MenuItemsList extends StatelessWidget {
         icon: 'assets/icons/icon_person.svg',
         title: 'Профиль',
         menuItem: MenuItem.profile,
-        allowedRoles: [UserRole.admin],
+        allowedRoles: [],
         onTap: () => onMenuItemSelected(MenuItem.profile),
       ),
       MenuItemModel(

@@ -11,6 +11,7 @@ export 'filter/filter.dart';
 export 'cards/tab_card.dart';
 export 'tags/dot_tag.dart';
 export 'tags/text_tag.dart';
+export 'tags/text_tag_button.dart';
 export 'date_time_picker/custom_date_picker.dart';
 export 'indicator/centered_indicator.dart';
 export 'chips/custom_cips.dart';

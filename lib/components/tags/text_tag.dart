@@ -7,7 +7,6 @@ class TextTag extends StatelessWidget {
     required this.text,
     required this.color,
     required this.textColor,
-    this.onTap,
     this.icon,
     this.isIconVisible = false,
   });
@@ -15,39 +14,29 @@ class TextTag extends StatelessWidget {
   final String text;
   final Color color;
   final Color textColor;
-  final void Function()? onTap;
-  final Widget? icon;
+  final IconData? icon;
   final bool? isIconVisible;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (isIconVisible! && icon != null) Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: icon!,
-            ),
-
-            Text(
-              textAlign: TextAlign.center,
-              text,
-              style: AppTypography.grey14w500.copyWith(color: textColor),
-            ),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: color),
       ),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: isIconVisible!
+          ? Icon(icon, color: textColor, size: 12)
+          : Text(
+              text,
+              style: AppTypography.grey14w500.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
     );
   }
 }

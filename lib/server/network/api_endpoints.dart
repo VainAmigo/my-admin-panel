@@ -7,5 +7,5 @@ class ApiEndpoints {
   static const String avarPolicySearch = '/api/accidents/policy';
   static const String avarFilteredSearch = '/api/accidents/filtered-search';
   static const String avarCreateClaim = '/api/accidents/create-claim';
-  static const String avarVerifications = '/api/users/search';
+  static const String userSearch = '/api/users/search';
 }

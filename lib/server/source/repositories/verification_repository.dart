@@ -11,7 +11,7 @@ class VerificationRepository {
     required int limit,
   }) async {
     final response = await _dioClient.post(
-      ApiEndpoints.avarVerifications,
+      ApiEndpoints.userSearch,
       data: request.toJson(),
       queryParameters: {'page': page, 'limit': limit},
     );

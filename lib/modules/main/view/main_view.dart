@@ -106,9 +106,9 @@ class _MainViewState extends State<MainView> {
       case MenuItem.accounting:
         return const PlaceholderView(title: 'Бухгалтерия');
       case MenuItem.users:
-        return const PlaceholderView(title: 'Пользователи');
+        return const UsersView();
       case MenuItem.profile:
-        return const PlaceholderView(title: 'Профиль');
+        return const UserView();
       case MenuItem.notifications:
         return const PlaceholderView(title: 'Уведомления');
       case MenuItem.verification:

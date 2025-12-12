@@ -25,11 +25,15 @@ class AppView extends StatelessWidget {
         final dioClient = DioClient(storage: storage);
         final authRepository = AuthRepository(dioClient);
         final authStorage = AuthStorage(storage);
+        final verificationRepository = VerificationRepository(dioClient);
+        final usersRepository = UsersRepository(dioClient);
 
         return MultiRepositoryProvider(
           providers: [
             RepositoryProvider<AuthRepository>.value(value: authRepository),
             RepositoryProvider<AuthStorage>.value(value: authStorage),
+            RepositoryProvider<VerificationRepository>.value(value: verificationRepository),
+            RepositoryProvider<UsersRepository>.value(value: usersRepository),
           ],
           child: MultiBlocProvider(
             providers: [
@@ -47,10 +51,16 @@ class AppView extends StatelessWidget {
                 create: (context) => AvarFilterCubit(AvarRepository(dioClient)),
               ),
               BlocProvider<VerificationCubit>(
-                create: (context) => VerificationCubit(VerificationRepository(dioClient)),
+                create: (context) =>
+                    VerificationCubit(VerificationRepository(dioClient)),
               ),
               BlocProvider<SetVerificationStatusCubit>(
-                create: (context) => SetVerificationStatusCubit(VerificationRepository(dioClient)),
+                create: (context) => SetVerificationStatusCubit(
+                  VerificationRepository(dioClient),
+                ),
+              ),
+              BlocProvider<UsersCubit>(
+                create: (context) => UsersCubit(UsersRepository(dioClient)),
               ),
             ],
             child: const AdminPanel(),

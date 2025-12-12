@@ -1,3 +1,4 @@
+import 'package:admin_panel/themes/theme.dart';
 import 'package:flutter/material.dart';
 import '../../themes/colors/app_colors.dart';
 
@@ -41,7 +42,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 300,
+      width: 250,
       height: 40,
       child: TextField(
         controller: _controller,
@@ -63,21 +64,21 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
           filled: true,
           fillColor: AppColors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSizing.defaultRadius),
             borderSide: BorderSide(
               color: AppColors.grey,
               width: 1
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSizing.defaultRadius),
             borderSide: BorderSide(
               color: AppColors.grey,
               width: 1
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSizing.defaultRadius),
             borderSide: BorderSide(
               color: AppColors.primary,
               width: 1,

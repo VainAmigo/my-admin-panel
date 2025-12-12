@@ -16,3 +16,6 @@ export 'dto/user_dto_model.dart';
 // verification models
 export 'verification_models/verification_list_model.dart';
 export 'verification_models/verification_set_verification_status_model.dart';
+
+// users models
+export 'users_models/users_search_model.dart';

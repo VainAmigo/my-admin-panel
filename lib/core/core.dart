@@ -5,4 +5,5 @@ export 'rbac/user_role.dart';
 export 'rbac/rbac_service.dart';
 export 'snack_bar/app_snackbar.dart';
 export 'utils/verification_status_util.dart';
+export 'utils/user_role_util.dart';
 export 'pdf/verification_pdf_generator.dart';

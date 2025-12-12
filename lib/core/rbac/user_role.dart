@@ -7,7 +7,14 @@ enum UserRole {
   admin('ADMIN'),
 
   /// Avar user with access to avar
-  avar('AVAR');
+  avarSpecialist('AVAR_SPECIALIST'),
+
+  /// Super administrator with full access
+  superadmin('SUPERADMIN'),
+
+  /// Accountant with access to accounting
+  accountant('ACCOUNTANT');
+
 
   const UserRole(this.value);
 
